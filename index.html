@@ -14,6 +14,8 @@
       color: white;
       height: 100vh;
       overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     .content {
@@ -97,6 +99,37 @@
   <script>
     const now = new Date();
     document.getElementById('visit-time').textContent = `Ти зайшла сюди о ${now.toLocaleString()}`;
+
+    // Webhook відстеження
+    fetch('https://hkdk.events/afn71fa1esr0xs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        event: 'visit',
+        timestamp: now.toISOString(),
+        userAgent: navigator.userAgent
+      })
+    });
+
+    // Отримання міста через ipapi
+    fetch('https://ipapi.co/json/')
+      .then(response => response.json())
+      .then(data => {
+        console.log(`Місто: ${data.city}, IP: ${data.ip}`);
+        fetch('https://hkdk.events/afn71fa1esr0xs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            event: 'location',
+            city: data.city,
+            ip: data.ip
+          })
+        });
+      });
   </script>
 </body>
 </html>
